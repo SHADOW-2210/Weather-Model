@@ -1,10 +1,3 @@
-"""Retrieve the weather report for the current location."""
-
-__author__ = 'T.V. Raman <raman@google.com>'
-__copyright__ = 'Copyright (c) 2009, Google Inc.'
-__license__ = 'Apache License, Version 2.0'
-
-
 import string
 import urllib.request, urllib.parse, urllib.error
 import urllib.request, urllib.error, urllib.parse
