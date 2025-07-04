@@ -1,37 +1,36 @@
-import string
-import urllib.request, urllib.parse, urllib.error
-import urllib.request, urllib.error, urllib.parse
-from xml.dom import minidom
+import requests
 
-WEATHER_URL = 'http://www.google.com/ig/api?weather=%s&hl=%s'
+API_KEY = '93057970572593c2857fabdbce2d22b8'
+BASE_URL = 'http://api.openweathermap.org/data/2.5/weather'
 
+def get_weather(location):
+    params = {
+        'q': location,
+        'appid': API_KEY,
+        'units': 'metric' 
+    }
+    
+    try:
+        response = requests.get(BASE_URL, params=params)
+        data = response.json()
+        
+        if response.status_code == 200:
+            city = data['name']
+            country = data['sys']['country']
+            temp = data['main']['temp']
+            humidity = data['main']['humidity']
+            description = data['weather'][0]['description']
 
-def extract_value(dom, parent, child):
-  """Convenience function to dig out weather values."""
-  return dom.getElementsByTagName(parent)[0].getElementsByTagName(child)[0].getAttribute('data')
+            print(f"\nWeather in {city}, {country}:")
+            print(f"Temperature: {temp}°C")
+            print(f"Humidity: {humidity}%")
+            print(f"Conditions: {description.capitalize()}\n")
+        else:
+            print(f"\nError: {data['message'].capitalize()}\n")
+    
+    except Exception as e:
+        print(f"\nAn error occurred: {e}\n")
 
-
-def fetch_weather(location, hl=''):
-  """Fetches weather report from Google
-
-  Args:
-    location: a zip code (94041); city name, state (weather=Mountain View,CA);...
-    hl: the language parameter (language code)
-
-  Returns:
-    a dict of weather data.
-
-  """
-  url = WEATHER_URL % (urllib.parse.quote(location), hl)
-  handler = urllib.request.urlopen(url)
-  data = handler.read()
-  dom = minidom.parseString(data)
-  handler.close()
-
-  data = {}
-  weather_dom = dom.getElementsByTagName('weather')[0]
-  data['city'] = extract_value(weather_dom, 'forecast_information','city')
-  data['temperature'] = extract_value(weather_dom, 'current_conditions','temp_f')
-  data['conditions'] = extract_value(weather_dom, 'current_conditions', 'condition')
-  dom.unlink()
-  return data
+if __name__ == "__main__":
+    location = input("Enter a city or ZIP code: ")
+    get_weather(location)
